@@ -2,16 +2,12 @@
 #include <windows.h>
 #include <cstdlib>
 #include <conio.h>
-<<<<<<< HEAD
 #include <fstream> // Thư viện đọc/ghi file (cho High Score)
-=======
->>>>>>> ee51f26be13303a9c4d5dc5391c371b03e7fdace
 
 using namespace std;
 
 void gotoxy(int column, int line);
 
-<<<<<<< HEAD
 // ==========================================
 //        CÁC HÀM XỬ LÝ UI/UX THÊM VÀO
 // ==========================================
@@ -98,8 +94,6 @@ void ShowGameOver(int score) {
 // ==========================================
 //        GIỮ NGUYÊN CODE GỐC CỦA TEAM
 // ==========================================
-=======
->>>>>>> ee51f26be13303a9c4d5dc5391c371b03e7fdace
 struct Point {
     int x, y;
 };
@@ -108,66 +102,37 @@ class CONRAN {
 public:
     Point A[100];
     int DoDai;
-<<<<<<< HEAD
-    Point duoiCu;
+    Point duoiCu; 
 
     CONRAN() {
         DoDai = 3;
-        A[0] = {10, 10};
-        A[1] = {11, 10};
-        A[2] = {12, 10};
+        A[0] = {10, 10}; 
+        A[1] = {11, 10}; 
+        A[2] = {12, 10}; 
     }
 
     void Ve() {
-        gotoxy(duoiCu.x, duoiCu.y);
-        cout << " ";
-
-        for (int i = 0; i < DoDai; i++) {
-            gotoxy(A[i].x, A[i].y);
-            if (i == 0) cout << "O";
-            else cout << "x";
-=======
-    Point duoiCu; // Lưu lại vị trí đuôi cũ để xóa
-
-    CONRAN() {
-        DoDai = 3;
-        A[0] = {10, 10}; // Đầu rắn
-        A[1] = {11, 10}; // Thân
-        A[2] = {12, 10}; // Đuôi
-    }
-
-    void Ve() {
-        // Xóa đuôi cũ 
         gotoxy(duoiCu.x, duoiCu.y);
         cout << " "; 
 
-        // Vẽ đầu và thân mới
         for (int i = 0; i < DoDai; i++) {
             gotoxy(A[i].x, A[i].y);
-            if (i == 0) cout << "O"; // Đầu rắn
-            else cout << "x";        // Thân rắn
->>>>>>> ee51f26be13303a9c4d5dc5391c371b03e7fdace
+            if (i == 0) cout << "O"; 
+            else cout << "x";        
         }
     }
 
     void DiChuyen(int Huong) {
-<<<<<<< HEAD
-        duoiCu = A[DoDai - 1];
+        duoiCu = A[DoDai - 1]; 
 
-=======
-        duoiCu = A[DoDai - 1]; // Lưu lại tọa độ đuôi trước khi di chuyển
-
-        // Thân chạy theo đầu
->>>>>>> ee51f26be13303a9c4d5dc5391c371b03e7fdace
         for (int i = DoDai - 1; i > 0; i--) {
             A[i] = A[i - 1];
         }
 
-<<<<<<< HEAD
-        if (Huong == 0) A[0].x++;
-        if (Huong == 1) A[0].y++;
-        if (Huong == 2) A[0].x--;
-        if (Huong == 3) A[0].y--;
+        if (Huong == 0) A[0].x++; 
+        if (Huong == 1) A[0].y++; 
+        if (Huong == 2) A[0].x--; 
+        if (Huong == 3) A[0].y--; 
     }
 };
 // ==========================================
@@ -194,8 +159,8 @@ int main() {
         int score = 0;
         DrawHUD(score, highScore);
 
-        CONRAN r;
-        int Huong = 2;
+        CONRAN r; 
+        int Huong = 2; 
         char t;
         bool gameOver = false;
         bool isPaused = false;
@@ -203,24 +168,24 @@ int main() {
         // -> CHÈN CODE KHỞI TẠO MỒI LẦN ĐẦU CỦA TEAM VÀO ĐÂY <-
 
         // 3. VÒNG LẶP GAME (GAME LOOP)
-        while (!gameOver) {
+        while (!gameOver) { 
             // Xử lý Input
             if (kbhit()) {
                 t = getch();
                 if (t == 'a' && Huong != 0) Huong = 2;
                 if (t == 'w' && Huong != 1) Huong = 3;
                 if (t == 'd' && Huong != 2) Huong = 0;
-                if (t == 's' && Huong != 3) Huong = 1;
+                if (t == 's' && Huong != 3) Huong = 1; 
                 if (t == 'p' || t == 'P') isPaused = !isPaused; // Tạm dừng
             }
-
+            
             // Xử lý Pause
             if (isPaused) {
                 TextColor(14); gotoxy(36, 1); cout << " PAUSED "; TextColor(7);
                 Sleep(100);
-                continue;
+                continue; 
             } else {
-                gotoxy(36, 1); cout << "        ";
+                gotoxy(36, 1); cout << "        "; 
             }
 
             // Rắn di chuyển
@@ -230,7 +195,7 @@ int main() {
             // Đụng tường
             if (r.A[0].x <= 2 || r.A[0].x >= 80 || r.A[0].y <= 2 || r.A[0].y >= 25) {
                 gameOver = true;
-                Beep(400, 400);
+                Beep(400, 400); 
             }
 
             // Tự cắn đuôi
@@ -248,19 +213,19 @@ int main() {
             if (!gameOver) {
                 TextColor(10); // Màu xanh lá cho rắn
                 r.Ve();
-                TextColor(7);
+                TextColor(7);  
             }
-
+            
             // Tốc độ game (Tùy chỉnh lại theo logic điểm của team)
             int speed = 100 - (score);
-            if (speed < 30) speed = 30;
-            Sleep(speed);
+            if (speed < 30) speed = 30; 
+            Sleep(speed); 
         }
 
         // 4. XỬ LÝ SAU KHI THUA
         if (score > highScore) {
             highScore = score;
-            GhiHighScore(highScore);
+            GhiHighScore(highScore); 
         }
 
         ShowGameOver(score);
@@ -268,37 +233,7 @@ int main() {
             choice = getch();
         } while (choice != 13 && choice != 27);
 
-        if (choice == 27) break;
-=======
-        // Cập nhật đầu rắn theo hướng WASD
-        if (Huong == 0) A[0].x++; // Phải (D)
-        if (Huong == 1) A[0].y++; // Xuống (S)
-        if (Huong == 2) A[0].x--; // Trái (A)
-        if (Huong == 3) A[0].y--; // Lên (W)
-    }
-};
-
-int main() {
-    CONRAN r;
-    int Huong = 2; 
-    char t;
-
-    system("cls"); 
-
-    while (true) { 
-        if (kbhit()) {
-            t = getch();
-            if (t == 'a' && Huong != 0) Huong = 2;
-            if (t == 'w' && Huong != 1) Huong = 3;
-            if (t == 'd' && Huong != 2) Huong = 0;
-            if (t == 's' && Huong != 3) Huong = 1; 
-        }
-        
-        r.DiChuyen(Huong);
-        r.Ve();
-        
-        Sleep(100); 
->>>>>>> ee51f26be13303a9c4d5dc5391c371b03e7fdace
+        if (choice == 27) break; 
     }
 
     return 0;
@@ -309,8 +244,4 @@ void gotoxy(int column, int line) {
     coord.X = column;
     coord.Y = line;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> ee51f26be13303a9c4d5dc5391c371b03e7fdace
