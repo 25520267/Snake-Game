@@ -2,9 +2,14 @@
 #include <windows.h>
 #include <cstdlib>
 #include <conio.h>
+#include <ctime>
 #include <fstream> // Thư viện đọc/ghi file (cho High Score)
 
 using namespace std;
+
+// 1. Định nghĩa hằng số (Phải đặt ở đầu)
+const int WIDTH = 40;
+const int HEIGHT = 20;
 
 void gotoxy(int column, int line);
 
@@ -83,7 +88,7 @@ void ShowMenu() {
 void ShowGameOver(int score) {
     TextColor(12); // Màu đỏ cảnh báo
     gotoxy(28, 10); cout << "===========================";
-    gotoxy(28, 11); cout << "         GAME OVER         ";
+    gotoxy(28, 11); cout << "          GAME OVER         ";
     gotoxy(28, 12); cout << "      Your Score: " << score << "      ";
     gotoxy(28, 13); cout << "===========================";
     TextColor(15);
@@ -98,6 +103,18 @@ struct Point {
     int x, y;
 };
 
+// 2. Hàm vẽ khung bản đồ
+void VeBanDo() {
+    for (int i = 0; i <= WIDTH; i++) {
+        gotoxy(i, 0); cout << "#";           // Tường trên
+        gotoxy(i, HEIGHT); cout << "#";      // Tường dưới
+    }
+    for (int i = 0; i <= HEIGHT; i++) {
+        gotoxy(0, i); cout << "#";           // Tường trái
+        gotoxy(WIDTH, i); cout << "#";       // Tường phải
+    }
+}
+
 class CONRAN {
 public:
     Point A[100];
@@ -106,15 +123,18 @@ public:
 
     CONRAN() {
         DoDai = 3;
-        A[0] = {10, 10}; 
-        A[1] = {11, 10}; 
-        A[2] = {12, 10}; 
+        // Đặt tọa độ từ nhánh Map-and-food để tránh tự cắn khi mới vào
+        A[0] = {12, 10}; // Đầu
+        A[1] = {11, 10}; // Thân
+        A[2] = {10, 10}; // Đuôi
+        duoiCu = {0, 0};
     }
 
     void Ve() {
         gotoxy(duoiCu.x, duoiCu.y);
         cout << " "; 
 
+        // Vẽ rắn mới
         for (int i = 0; i < DoDai; i++) {
             gotoxy(A[i].x, A[i].y);
             if (i == 0) cout << "O"; 
@@ -129,18 +149,28 @@ public:
             A[i] = A[i - 1];
         }
 
-        if (Huong == 0) A[0].x++; 
-        if (Huong == 1) A[0].y++; 
-        if (Huong == 2) A[0].x--; 
-        if (Huong == 3) A[0].y--; 
+        if (Huong == 0) A[0].x++; // Phải
+        if (Huong == 1) A[0].y++; // Xuống
+        if (Huong == 2) A[0].x--; // Trái
+        if (Huong == 3) A[0].y--; // Lên
+    }
+
+    bool AnMoi(Point food) {
+        if (A[0].x == food.x && A[0].y == food.y) {
+            DoDai++;
+            return true;
+        }
+        return false;
     }
 };
+
 // ==========================================
 //        KẾT THÚC CODE GỐC
 // ==========================================
 
 int main() {
     Nocursortype();  // Ẩn con trỏ nhấp nháy
+    srand(time(NULL)); 
     int highScore = DocHighScore();
 
     while (true) {
@@ -155,27 +185,30 @@ int main() {
 
         // 2. KHỞI TẠO MÀN CHƠI MỚI
         system("cls");
-        VeTuong();
+        VeTuong(); // Vẽ tường UI (Khung lớn)
         int score = 0;
         DrawHUD(score, highScore);
 
         CONRAN r; 
-        int Huong = 2; 
+        Point food = {15, 5}; 
+        int Huong = 0; // Đi sang phải cho khớp tọa độ khởi tạo
         char t;
         bool gameOver = false;
         bool isPaused = false;
 
-        // -> CHÈN CODE KHỞI TẠO MỒI LẦN ĐẦU CỦA TEAM VÀO ĐÂY <-
+        // Vẽ mồi lần đầu
+        gotoxy(food.x, food.y);
+        cout << "*";
 
         // 3. VÒNG LẶP GAME (GAME LOOP)
         while (!gameOver) { 
             // Xử lý Input
             if (kbhit()) {
                 t = getch();
-                if (t == 'a' && Huong != 0) Huong = 2;
-                if (t == 'w' && Huong != 1) Huong = 3;
-                if (t == 'd' && Huong != 2) Huong = 0;
-                if (t == 's' && Huong != 3) Huong = 1; 
+                if ((t == 'a' || t == 'A') && Huong != 0) Huong = 2;
+                if ((t == 'w' || t == 'W') && Huong != 1) Huong = 3;
+                if ((t == 'd' || t == 'D') && Huong != 2) Huong = 0;
+                if ((t == 's' || t == 'S') && Huong != 3) Huong = 1; 
                 if (t == 'p' || t == 'P') isPaused = !isPaused; // Tạm dừng
             }
             
@@ -191,8 +224,19 @@ int main() {
             // Rắn di chuyển
             r.DiChuyen(Huong);
 
+            // XỬ LÝ ĂN MỒI
+            if (r.AnMoi(food)) {
+                score += 10;
+                DrawHUD(score, highScore);
+                // Tạo tọa độ mồi mới (Giới hạn trong khung VeTuong)
+                food.x = rand() % (78 - 3 + 1) + 3;
+                food.y = rand() % (23 - 3 + 1) + 3;
+                gotoxy(food.x, food.y);
+                cout << "*";
+            }
+
             // XỬ LÝ VA CHẠM
-            // Đụng tường
+            // Đụng tường (Theo khung VeTuong)
             if (r.A[0].x <= 2 || r.A[0].x >= 80 || r.A[0].y <= 2 || r.A[0].y >= 25) {
                 gameOver = true;
                 Beep(400, 400); 
@@ -206,9 +250,6 @@ int main() {
                 }
             }
 
-            // -> CHÈN CODE XỬ LÝ ĂN MỒI, SINH MỒI MỚI VÀ TĂNG CHIỀU DÀI RẮN CỦA TEAM VÀO ĐÂY <-
-            // Lưu ý: Nhớ cộng biến `score` và gọi lại hàm `DrawHUD(score, highScore);` để HUD cập nhật điểm nhé!
-
             // Render hình ảnh
             if (!gameOver) {
                 TextColor(10); // Màu xanh lá cho rắn
@@ -216,8 +257,8 @@ int main() {
                 TextColor(7);  
             }
             
-            // Tốc độ game (Tùy chỉnh lại theo logic điểm của team)
-            int speed = 100 - (score);
+            // Tốc độ game
+            int speed = 100 - (score / 5);
             if (speed < 30) speed = 30; 
             Sleep(speed); 
         }
@@ -239,6 +280,7 @@ int main() {
     return 0;
 }
 
+// Cần định nghĩa hàm gotoxy ở cuối để code chạy được
 void gotoxy(int column, int line) {
     COORD coord;
     coord.X = column;
