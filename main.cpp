@@ -7,7 +7,6 @@
 
 using namespace std;
 
-// 1. Định nghĩa hằng số (Phải đặt ở đầu)
 const int WIDTH = 40;
 const int HEIGHT = 20;
 
@@ -22,7 +21,7 @@ void TextColor(int color) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-// Hàm ẩn con trỏ chuột nhấp nháy (Giúp UX mượt mắt hơn)
+// Hàm ẩn con trỏ chuột nhấp nháy 
 void Nocursortype() {
     CONSOLE_CURSOR_INFO info;
     info.bVisible = FALSE;
